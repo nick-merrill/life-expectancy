@@ -4,6 +4,10 @@ This is a (likely flawed) attempt to understand the distribution of how much
 life one can expect to live, given the fact that you've lived as long as you
 have already.
 
+An example of running the script:
+
+<img alt="min_age=0 us-total-population" src="./examples/min_age=0,us-total-population.png" style="max-width:500px;"/>
+
 ## Statistics
 
 **My background with statistics is fairly weak, so I've likely made some horrible
@@ -31,4 +35,3 @@ pip install -r requirements.txt
 # Run the script
 python3 analyze.py --min-age [your_age_of_interest]
 ```
-
