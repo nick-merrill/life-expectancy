@@ -6,8 +6,8 @@ have already.
 
 ## Statistics
 
-My background with statistics is fairly weak, so I've likely made some horrible
-assumptions. Feel free to call out whatever you see and add it as an issue to
+**My background with statistics is fairly weak, so I've likely made some horrible
+assumptions.** Feel free to call out whatever you see and add it as an issue to
 the repo to warn others. Also feel free to make a PR to fix the issue.
 
 ## Data
@@ -29,5 +29,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Run the script
-python3 analyze.py --min-age [your_age]
+python3 analyze.py --min-age [your_age_of_interest]
 ```
+

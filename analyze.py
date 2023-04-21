@@ -1,17 +1,19 @@
 #! /usr/bin/env python
 import argparse
 import csv
+import logging
 import re
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import skewnorm
 
 PERCENTILES = [10, 50, 90]
 PERCENTILE_COLORS = ["red", "black", "green"]
 # If True, we will make some assumptions about the data that favor a slightly
 # longer life expectancy.
 OPTIMISTIC_MODE = True
+
+_logger = logging.getLogger(__name__)
 
 
 def get_data(data_path: str, min_age: int = 0) -> dict[int, int]:
@@ -41,7 +43,7 @@ def get_data(data_path: str, min_age: int = 0) -> dict[int, int]:
         if age != 100:
             raise ValueError("Expected the oldest age to be 100.")
         previous_year_death_count = oldest_death_data[-2][1]  # 5000
-        print(
+        _logger.debug(
             f"Previous year ({oldest_death_data[-2][0]}) death count:",
             previous_year_death_count,
         )
@@ -50,16 +52,11 @@ def get_data(data_path: str, min_age: int = 0) -> dict[int, int]:
         deaths_per_year_change_rate = (
             oldest_death_data[-2][1] / oldest_death_data[-3][1]
         )  # 0.7
-        print("Deaths per year rate of change:", deaths_per_year_change_rate)
+        _logger.debug("Deaths per year rate of change:", deaths_per_year_change_rate)
         while remaining_deaths_to_redistribute > 0:  # 12000
-            print("Remaining deaths to redistribute:", remaining_deaths_to_redistribute)
-            # 98 => 5300
-            # 99 => 5000
-            # 100 => 4700
-            # 101 => 4400
-            # 102 => 4100
-            # 103 => 2900 (remaining)
-
+            _logger.debug(
+                "Remaining deaths to redistribute:", remaining_deaths_to_redistribute
+            )
             this_year_death_count = min(
                 remaining_deaths_to_redistribute,
                 max(
@@ -68,11 +65,13 @@ def get_data(data_path: str, min_age: int = 0) -> dict[int, int]:
                 ),
             )
 
-            print("Adding", this_year_death_count, "deaths at age", age)
+            _logger.debug("Adding", this_year_death_count, "deaths at age", age)
             death_count_by_age[age] = this_year_death_count
 
             remaining_deaths_to_redistribute -= this_year_death_count
-            print("remaining deaths to redistribute:", remaining_deaths_to_redistribute)
+            _logger.debug(
+                "remaining deaths to redistribute:", remaining_deaths_to_redistribute
+            )
             previous_year_death_count = this_year_death_count
             age += 1
 
@@ -140,6 +139,16 @@ def graph(min_age: int, data_path: str):
         frameon=False,
     )
 
+    print(f"Based on the given data and assumptions, someone at age {min_age} has a")
+    for value, name in zip(percentiles, PERCENTILES):
+        remaining_years = value - min_age
+        remaining_weeks = remaining_years * 52
+        print(
+            f"{name}% chance of dying before {value:.1f} years old. That's {remaining_weeks:.0f} weeks after age {min_age}"
+        )
+    print(
+        "Showing the graph of death age distribution now. Close the graph to exit the program."
+    )
     plt.show()
 
 
