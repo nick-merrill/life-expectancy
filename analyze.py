@@ -82,7 +82,7 @@ def get_data(data_path: str, min_age: int = 0) -> dict[int, int]:
     return death_count_by_age
 
 
-def graph(min_age: int, data_path: str, include_distribution=False):
+def graph(min_age: int, data_path: str):
     death_count_by_age = get_data(min_age=min_age, data_path=data_path)
     # Create data from the histogram
     ages = np.array(list(death_count_by_age.keys()))
@@ -109,19 +109,6 @@ def graph(min_age: int, data_path: str, include_distribution=False):
         f"$\sigma = {standard_deviation:.1f}$ years\n"
         f"$n = {n:,}$ people",
     )
-
-    if include_distribution:
-        # NB: This distribution is a total guess, and it's not even a good guess.
-        #   Best to just use the PDF of the histogram of past data, not a poor
-        #   mathematical approximation.
-        distribution_x_vals = np.linspace(start=ages.min(), stop=ages.max(), num=200)
-        distribution_y_vals = skewnorm.pdf(
-            distribution_x_vals, a=0.9, loc=mean, scale=standard_deviation
-        )
-        # Plot distribution on the right axis
-        right_axis = plt.twinx()
-        right_axis.plot(distribution_x_vals, distribution_y_vals, color="red")
-        right_axis.legend(["estimated distribution"], loc="best", frameon=False)
 
     # Create some reconstituted/simulated data to represent each death per year,
     # since the government only gave us a summary histogram of deaths.
@@ -172,15 +159,9 @@ if __name__ == "__main__":
         default=0,
         help="Data from people who died below this age will be removed from the dataset before analysis.",
     )
-    parser.add_argument(
-        "--no-distribution",
-        action="store_true",
-        help="Pass this flag if you want to skip the distribution.",
-    )
     options = parser.parse_args()
 
     graph(
         min_age=options.min_age,
         data_path=options.data_path,
-        include_distribution=not options.no_distribution,
     )
